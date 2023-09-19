@@ -31,9 +31,9 @@ export default function HomeView() {
   return (
     <Box maw={300} mx="auto">
       <form onSubmit={form.onSubmit(onSubmit)}>
-        <TextInput withAsterisk label="Channel" {...form.getInputProps("channel")} />
-        <Group position="right" mt="md">
-          <Button type="submit">Submit</Button>
+        <TextInput withAsterisk label="Channel ID" {...form.getInputProps("channel")} />
+        <Group mt="md">
+          <Button type="submit">Connect</Button>
         </Group>
       </form>
     </Box>
