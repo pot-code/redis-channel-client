@@ -1,32 +1,40 @@
 import { Box, Button, Group, TextInput } from "@mantine/core"
 import { useForm } from "@mantine/form"
+import { RetryWebSocket } from "@/utils/websocket"
+
+const ws = new RetryWebSocket()
 
 export default function HomeView() {
-  const ws = useRef<WebSocket>()
   const form = useForm({
     initialValues: {
       channel: "",
     },
   })
-
+  const onOpen = useCallback(() => {
+    console.log("opened")
+  }, [])
+  const onClose = useCallback(() => {
+    console.log("closed")
+  }, [])
+  const onRetry = useCallback(() => {
+    console.log("retrying...")
+  }, [])
   const onSubmit = useCallback(({ channel }: any) => {
-    const sock = new WebSocket(`ws://localhost:8080/ws?channel=${channel}`)
-
-    sock.onopen = () => {
-      console.log("opened")
-    }
-    sock.onclose = () => {
-      console.log("closed")
-    }
-    ws.current = sock
+    ws.connect(`ws://localhost:8080/ws?channel=${channel}`)
   }, [])
 
-  useEffect(
-    () => () => {
-      ws.current?.close()
-    },
-    [],
-  )
+  useEffect(() => {
+    ws.on("open", onOpen)
+    ws.on("close", onClose)
+    ws.on("retry", onRetry)
+
+    return () => {
+      ws.off("open", onOpen)
+      ws.off("close", onClose)
+      ws.off("retry", onRetry)
+      ws.close()
+    }
+  }, [onClose, onOpen, onRetry])
 
   return (
     <Box maw={300} mx="auto">
